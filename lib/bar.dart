@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
+import 'package:ocr/newFile.dart';
 
 class OCRPage extends StatefulWidget {
   @override
@@ -11,6 +14,20 @@ class OCRPage extends StatefulWidget {
 class _OCRPageState extends State<OCRPage> {
   int _ocrCamera = FlutterMobileVision.CAMERA_BACK;
   List _text = [];
+  var data;
+  void loadJson() async {
+    final String response =
+        await rootBundle.loadString('assets/translate.json');
+    data = await json.decode(response);
+    print(data);
+  }
+
+  @override
+  void initState() {
+    loadJson();
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +84,14 @@ class _OCRPageState extends State<OCRPage> {
       print(values);
       setState(() {
         _text = values;
-        print("text");
-        print(values);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => NewScreen(
+                    text: values,
+                    data: data,
+                  )),
+        );
       });
     } on Exception {
       texts.add(OcrText('Failed to recognize text'));
